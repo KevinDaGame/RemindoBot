@@ -1,6 +1,8 @@
-﻿using Discord;
+﻿using DAL;
+using Discord;
 using Discord.Net;
 using Discord.WebSocket;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Pathoschild.NaturalTimeParser.Parser;
@@ -20,6 +22,11 @@ public class Program
     public async Task MainAsync()
     {
         _services = CreateServices();
+
+        var context = _services.GetRequiredService<RemindoDbContext>();
+        await context.Database.MigrateAsync();
+
+
         _client = _services.GetRequiredService<DiscordSocketClient>();
         _client.Log += Log;
         _client.Ready += Client_Ready;
@@ -39,7 +46,7 @@ public class Program
     {
         var guild = _client.GetGuild(Convert.ToUInt64(Environment.GetEnvironmentVariable("DISCORD_GUILD_ID")));
 
-        var guildCommand = new SlashCommandBuilder()
+        var globalCommand = new SlashCommandBuilder()
             .WithName("remindme")
             .WithDescription("Create a reminder!")
             .AddOption("string", ApplicationCommandOptionType.String, "The reminder message", true)
@@ -47,7 +54,7 @@ public class Program
 
         try
         {
-            await guild.CreateApplicationCommandAsync(guildCommand.Build());
+            await guild.CreateApplicationCommandAsync(globalCommand.Build());
         }
         catch (ApplicationCommandException exception)
         {
@@ -71,9 +78,15 @@ public class Program
             return;
         }
 
+        if (dateTime < DateTime.Now)
+        {
+            await command.RespondAsync($"{time} is invalid. It is in the past.");
+            return;
+        }
+
         var service = _services.GetRequiredService<IRemindoService>();
-        
-        await service.CreateReminder(new Reminder()
+
+        await service.CreateReminder(new ReminderDTO
         {
             RemindTime = dateTime,
             Message = message,
@@ -81,22 +94,26 @@ public class Program
             guildId = command.GuildId,
             channelId = command.ChannelId
         });
-        
+
         await command.RespondAsync(
             $"You executed {command.Data.Name} successfully! You will be reminded at {dateTime} with the message: {message}");
     }
 
     static IServiceProvider CreateServices()
     {
-        var config = new DiscordSocketConfig()
+        var config = new DiscordSocketConfig
         {
             //...
         };
+        var connectionString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING") ??
+                               throw new Exception("MYSQL_CONNECTION_STRING not found");
         var services = new ServiceCollection()
             .AddSingleton(config)
             .AddSingleton<DiscordSocketClient>()
             .AddTransient<IRemindoRepository, RemindoRepository>()
             .AddTransient<IRemindoService, RemindoService>()
+            .AddDbContext<RemindoDbContext>(optionsBuilder =>
+                optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)))
             .BuildServiceProvider();
         return services;
     }

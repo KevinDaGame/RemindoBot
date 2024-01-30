@@ -17,7 +17,7 @@ public class RemindoService : IRemindoService
         _client = client;
     }
 
-    public async Task CreateReminder(Reminder reminder)
+    public async Task CreateReminder(ReminderDTO reminder)
     {
         var reminderId = await _repository.CreateReminder(reminder);
         var timer = new Timer(_ => HandleReminder(reminderId), null, reminder.RemindTime - DateTime.Now, TimeSpan.Zero);
@@ -27,32 +27,33 @@ public class RemindoService : IRemindoService
     public async Task HandleReminder(long reminderId)
     {
         var reminder = _repository.GetReminder(reminderId);
-        if (reminder == null)
+        switch (reminder)
         {
-            return;
-        }
+            case null:
+                return;
+            case {guildId: not null, channelId: not null}:
+                try
+                {
+                    var guild = _client.GetGuild(reminder.guildId.Value);
+                    var channel = guild.GetTextChannel(reminder.channelId.Value);
+                    await channel.SendMessageAsync($"<@{reminder.userId}> {reminder.Message}");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
 
-        if (reminder is {guildId: not null, channelId: not null})
-        {
-            try
+                break;
+            default:
             {
-                var guild = _client.GetGuild(reminder.guildId.Value);
-                var channel = guild.GetTextChannel(reminder.channelId.Value);
-                await channel.SendMessageAsync($"<@{reminder.userId}> {reminder.Message}");
+                var user = await _client.GetUserAsync(reminder.userId);
+                await user.SendMessageAsync(reminder.Message);
+                break;
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
-        }
-        else
-        {
-            var user = await _client.GetUserAsync(reminder.userId);
-            await user.SendMessageAsync(reminder.Message);
         }
 
 
-        await _repository.SetReminderHandled(reminder);
+        await _repository.SetReminderHandled(reminder.Id);
         _timers.Remove(reminderId);
     }
 }

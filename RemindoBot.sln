@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemindoBot", "RemindoBot\RemindoBot.csproj", "{18121E33-478E-4E0D-B6A5-D4CE407DB60F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{D46415E1-1384-45E7-88BA-8D1232A34619}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{18121E33-478E-4E0D-B6A5-D4CE407DB60F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{18121E33-478E-4E0D-B6A5-D4CE407DB60F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{18121E33-478E-4E0D-B6A5-D4CE407DB60F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D46415E1-1384-45E7-88BA-8D1232A34619}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D46415E1-1384-45E7-88BA-8D1232A34619}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D46415E1-1384-45E7-88BA-8D1232A34619}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D46415E1-1384-45E7-88BA-8D1232A34619}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

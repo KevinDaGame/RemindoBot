@@ -1,30 +1,53 @@
-﻿using RemindoBot.Models;
+﻿using DAL;
+using Microsoft.EntityFrameworkCore;
+using RemindoBot.Models;
 
 namespace RemindoBot.Repositories;
 
 public class RemindoRepository : IRemindoRepository
 {
-    static List<Reminder> _reminders = new List<Reminder>();
+    private readonly RemindoDbContext _context;
 
-    public async Task<long> CreateReminder(Reminder reminder)
+    public RemindoRepository(RemindoDbContext context)
     {
-        _reminders.Add(reminder);
-        return Convert.ToInt64(_reminders.Count - 1);
+        _context = context;
     }
 
-    public Task<IEnumerable<Reminder>> GetReminders()
+    public async Task<long> CreateReminder(ReminderDTO reminderDto)
     {
-        return Task.FromResult(_reminders.AsEnumerable());
+        var reminder = new Reminder
+        {
+            Message = reminderDto.Message,
+            RemindTime = reminderDto.RemindTime,
+            userId = reminderDto.userId,
+            guildId = reminderDto.guildId,
+            channelId = reminderDto.channelId
+        };
+        
+        _context.Reminders.Add(reminder);
+        await _context.SaveChangesAsync();
+        return reminder.Id;
     }
 
-    public Task SetReminderHandled(Reminder reminder)
+    public async Task<IEnumerable<Reminder>> GetReminders()
     {
-        _reminders.Remove(reminder);
-        return Task.CompletedTask;
+        return await _context.Reminders.ToListAsync();
+    }
+
+    public Task SetReminderHandled(long reminderId)
+    {
+        var reminder = GetReminder(reminderId);
+        if (reminder == null)
+        {
+            return Task.CompletedTask;
+        }
+        
+        _context.Reminders.Remove(reminder);
+        return _context.SaveChangesAsync();
     }
 
     public Reminder? GetReminder(long reminderId)
     {
-        return _reminders[Convert.ToInt32(reminderId)];
+        return _context.Reminders.Find(reminderId);
     }
 }

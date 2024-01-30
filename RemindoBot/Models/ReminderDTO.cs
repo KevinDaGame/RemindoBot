@@ -1,6 +1,6 @@
 ﻿namespace RemindoBot.Models;
 
-public class Reminder
+public class ReminderDTO
 {
     public DateTime RemindTime { get; set; }
     public string Message { get; set; }

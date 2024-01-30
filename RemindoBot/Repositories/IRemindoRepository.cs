@@ -1,12 +1,13 @@
-﻿using RemindoBot.Models;
+﻿using DAL;
+using RemindoBot.Models;
 
 namespace RemindoBot.Repositories;
 
 public interface IRemindoRepository
 {
-    Task<long> CreateReminder(Reminder reminder);
+    Task<long> CreateReminder(ReminderDTO reminder);
 
     Task<IEnumerable<Reminder>> GetReminders();
-    Task SetReminderHandled(Reminder reminder);
+    Task SetReminderHandled(long reminderId);
     Reminder? GetReminder(long reminderId);
 }
