@@ -304,5 +304,4 @@ nuget.config
 
 **/.stryker-tmp/*
 
-# Frontend dist
-**/launchSettings.json
+launchSettings.json
