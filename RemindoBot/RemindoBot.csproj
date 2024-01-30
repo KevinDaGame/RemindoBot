@@ -16,6 +16,8 @@
 
     <ItemGroup>
       <PackageReference Include="Discord.Net" Version="3.13.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="7.0.0" />
+      <PackageReference Include="Pathoschild.NaturalTimeParser" Version="0.2.0-alpha" />
     </ItemGroup>
 
 </Project>
