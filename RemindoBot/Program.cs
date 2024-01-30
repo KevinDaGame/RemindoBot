@@ -17,7 +17,10 @@ public class Program
     private DiscordSocketClient _client;
     private IServiceProvider _services;
 
-    public static Task Main(string[] args) => new Program().MainAsync();
+    public static Task Main(string[] args)
+    {
+        return new Program().MainAsync();
+    }
 
     public async Task MainAsync()
     {
@@ -99,7 +102,7 @@ public class Program
             $"You executed {command.Data.Name} successfully! You will be reminded at {dateTime} with the message: {message}");
     }
 
-    static IServiceProvider CreateServices()
+    private static IServiceProvider CreateServices()
     {
         var config = new DiscordSocketConfig
         {

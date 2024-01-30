@@ -23,7 +23,7 @@ public class RemindoRepository : IRemindoRepository
             guildId = reminderDto.guildId,
             channelId = reminderDto.channelId
         };
-        
+
         _context.Reminders.Add(reminder);
         await _context.SaveChangesAsync();
         return reminder.Id;
@@ -37,11 +37,8 @@ public class RemindoRepository : IRemindoRepository
     public Task SetReminderHandled(long reminderId)
     {
         var reminder = GetReminder(reminderId);
-        if (reminder == null)
-        {
-            return Task.CompletedTask;
-        }
-        
+        if (reminder == null) return Task.CompletedTask;
+
         _context.Reminders.Remove(reminder);
         return _context.SaveChangesAsync();
     }

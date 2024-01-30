@@ -7,9 +7,9 @@ namespace RemindoBot.Services;
 
 public class RemindoService : IRemindoService
 {
-    private readonly IRemindoRepository _repository;
     private readonly DiscordSocketClient _client;
-    private Dictionary<long, Timer> _timers = new Dictionary<long, Timer>();
+    private readonly IRemindoRepository _repository;
+    private readonly Dictionary<long, Timer> _timers = new();
 
     public RemindoService(IRemindoRepository repository, DiscordSocketClient client)
     {

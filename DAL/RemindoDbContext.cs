@@ -12,6 +12,9 @@ public class RemindoDbContext : DbContext
     {
     }
 
+
+    public DbSet<Reminder> Reminders { get; set; } = null!;
+
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         if (optionsBuilder.IsConfigured) return;
@@ -28,7 +31,4 @@ public class RemindoDbContext : DbContext
             .Property(r => r.Message).HasMaxLength(256)
             .IsRequired();
     }
-
-
-    public DbSet<Reminder> Reminders { get; set; } = null!;
 }
