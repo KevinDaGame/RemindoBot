@@ -1,11 +1,10 @@
 ﻿using DAL;
 using Discord;
-using Discord.Net;
 using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using RemindoBot.Models;
+using Microsoft.Extensions.Logging;
+using RemindoBot.Commands;
 using RemindoBot.Repositories;
 using RemindoBot.Services;
 
@@ -15,19 +14,21 @@ public class Program
 {
     private DiscordSocketClient _client;
     private IServiceProvider _services;
+    private ILogger _logger;
 
     public static Task Main(string[] args)
     {
         return new Program().MainAsync();
     }
 
-    public async Task MainAsync()
+    private async Task MainAsync()
     {
         _services = CreateServices();
 
         var context = _services.GetRequiredService<RemindoDbContext>();
         await context.Database.MigrateAsync();
 
+        _logger = _services.GetRequiredService<ILogger<Program>>();
 
         _client = _services.GetRequiredService<DiscordSocketClient>();
         _client.Log += Log;
@@ -44,76 +45,35 @@ public class Program
         await Task.Delay(-1);
     }
 
-    public async Task Client_Ready()
+    public Task Client_Ready()
     {
-        var globalCommand = new SlashCommandBuilder()
-            .WithName("remindme")
-            .WithDescription("Create a reminder!")
-            .AddOption("string", ApplicationCommandOptionType.String, "The reminder message", true)
-            .AddOption("time", ApplicationCommandOptionType.String, "The time to remind you", true);
-
-        try
-        {
-            await _client.CreateGlobalApplicationCommandAsync(globalCommand.Build());
-        }
-        catch (ApplicationCommandException exception)
-        {
-            var json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
-            Console.WriteLine(json);
-        }
+        var commandManager = _services.GetRequiredService<CommandManager>();
+        commandManager.RegisterCommands();
+        return Task.CompletedTask;
     }
 
     private async Task SlashCommandHandler(SocketSlashCommand command)
     {
-        var timeParserService = _services.GetRequiredService<ITimeParserService>();
-        var message = command.Data.Options.First().Value.ToString();
-        var time = command.Data.Options.Last().Value.ToString();
-        DateTime dateTime;
-        try
-        {
-            dateTime = timeParserService.ParseTime(time);
-        }
-        catch (Exception e)
-        {
-            await command.RespondAsync($"Unable to parse time: {time}");
-            return;
-        }
-
-        if (dateTime < DateTime.Now)
-        {
-            await command.RespondAsync($"{time} is invalid. It is in the past.");
-            return;
-        }
-
-        var service = _services.GetRequiredService<IRemindoService>();
-
-        await service.CreateReminder(new ReminderDTO
-        {
-            RemindTime = dateTime,
-            Message = message,
-            userId = command.User.Id,
-            guildId = command.GuildId,
-            channelId = command.ChannelId
-        });
-
-        await command.RespondAsync(
-            $"You executed {command.Data.Name} successfully! You will be reminded at {dateTime} with the message: {message}");
+        var commandManager = _services.GetRequiredService<CommandManager>();
+        await commandManager.SlashCommandHandler(command);
     }
 
     private static IServiceProvider CreateServices()
     {
-        var config = new DiscordSocketConfig
-        {
-            //...
-        };
+        var config = new DiscordSocketConfig();
         var connectionString = Environment.GetEnvironmentVariable("MYSQL_CONNECTION_STRING") ??
                                throw new Exception("MYSQL_CONNECTION_STRING not found");
         var services = new ServiceCollection()
             .AddSingleton(config)
             .AddSingleton<DiscordSocketClient>()
+            .AddSingleton<CommandManager>()
             .AddSingleton<ITimeParserService, TimeParserService>()
             .AddTransient<IRemindoRepository, RemindoRepository>()
             .AddTransient<IRemindoService, RemindoService>()
+            .AddLogging(builder =>
+            {
+                builder.AddConsole();
+            })
             .AddDbContext<RemindoDbContext>(optionsBuilder =>
                 optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)))
             .BuildServiceProvider();
@@ -122,7 +82,7 @@ public class Program
 
     private Task Log(LogMessage msg)
     {
-        Console.WriteLine(msg.ToString());
+        _logger.LogInformation(msg.ToString());
         return Task.CompletedTask;
     }
 }
