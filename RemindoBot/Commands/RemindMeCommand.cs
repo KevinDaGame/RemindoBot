@@ -25,14 +25,14 @@ public class RemindMeCommand : ICommand
 
     public async Task Handle(SocketSlashCommand command)
     {
-        var message = command.Data.Options.First().Value.ToString();
-        var time = command.Data.Options.Last().Value.ToString();
+        var message = command.Data.Options.First().Value.ToString()!;
+        var time = command.Data.Options.Last().Value.ToString()!;
         DateTime dateTime;
         try
         {
             dateTime = _timeParserService.ParseTime(time);
         }
-        catch (Exception e)
+        catch (Exception)
         {
             await command.RespondAsync($"Unable to parse time: {time}");
             return;
