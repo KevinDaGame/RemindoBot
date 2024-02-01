@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemindoBot", "RemindoBot\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DAL", "DAL\DAL.csproj", "{D46415E1-1384-45E7-88BA-8D1232A34619}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemindoBot.Test", "RemindoBot.Test\RemindoBot.Test.csproj", "{4B83945F-3881-41A8-973B-B8634DCE1D9E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{D46415E1-1384-45E7-88BA-8D1232A34619}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D46415E1-1384-45E7-88BA-8D1232A34619}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D46415E1-1384-45E7-88BA-8D1232A34619}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B83945F-3881-41A8-973B-B8634DCE1D9E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B83945F-3881-41A8-973B-B8634DCE1D9E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B83945F-3881-41A8-973B-B8634DCE1D9E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B83945F-3881-41A8-973B-B8634DCE1D9E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
