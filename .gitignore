@@ -307,3 +307,4 @@ nuget.config
 launchSettings.json
 
 **/mysql/*
+**/docker-compose.yml
