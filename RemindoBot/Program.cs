@@ -5,7 +5,6 @@ using Discord.WebSocket;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
-using Pathoschild.NaturalTimeParser.Parser;
 using RemindoBot.Models;
 using RemindoBot.Repositories;
 using RemindoBot.Services;
@@ -47,8 +46,6 @@ public class Program
 
     public async Task Client_Ready()
     {
-        var guild = _client.GetGuild(Convert.ToUInt64(Environment.GetEnvironmentVariable("DISCORD_GUILD_ID")));
-
         var globalCommand = new SlashCommandBuilder()
             .WithName("remindme")
             .WithDescription("Create a reminder!")
@@ -57,7 +54,7 @@ public class Program
 
         try
         {
-            await guild.CreateApplicationCommandAsync(globalCommand.Build());
+            await _client.CreateGlobalApplicationCommandAsync(globalCommand.Build());
         }
         catch (ApplicationCommandException exception)
         {
@@ -68,12 +65,13 @@ public class Program
 
     private async Task SlashCommandHandler(SocketSlashCommand command)
     {
+        var timeParserService = _services.GetRequiredService<ITimeParserService>();
         var message = command.Data.Options.First().Value.ToString();
         var time = command.Data.Options.Last().Value.ToString();
         DateTime dateTime;
         try
         {
-            dateTime = DateTime.Now.Offset(time);
+            dateTime = timeParserService.ParseTime(time);
         }
         catch (Exception e)
         {
@@ -113,6 +111,7 @@ public class Program
         var services = new ServiceCollection()
             .AddSingleton(config)
             .AddSingleton<DiscordSocketClient>()
+            .AddSingleton<ITimeParserService, TimeParserService>()
             .AddTransient<IRemindoRepository, RemindoRepository>()
             .AddTransient<IRemindoService, RemindoService>()
             .AddDbContext<RemindoDbContext>(optionsBuilder =>

@@ -305,3 +305,5 @@ nuget.config
 **/.stryker-tmp/*
 
 launchSettings.json
+
+**/mysql/*
