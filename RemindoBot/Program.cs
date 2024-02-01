@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using RemindoBot.Commands;
+using RemindoBot.Handlers;
 using RemindoBot.Repositories;
 using RemindoBot.Services;
 
@@ -47,7 +48,10 @@ public class Program
 
     public Task Client_Ready()
     {
+        var handlerManager = _services.GetRequiredService<HandlerManager>();
         var commandManager = _services.GetRequiredService<CommandManager>();
+        
+        handlerManager.RegisterHandlers();
         commandManager.RegisterCommands();
         return Task.CompletedTask;
     }
@@ -66,8 +70,9 @@ public class Program
         var services = new ServiceCollection()
             .AddSingleton(config)
             .AddSingleton<DiscordSocketClient>()
+            .AddSingleton<HandlerManager>()
             .AddSingleton<CommandManager>()
-            .AddSingleton<ITimeParserService, TimeParserService>()
+            .AddTransient<ITimeParserService, TimeParserService>()
             .AddTransient<IRemindoRepository, RemindoRepository>()
             .AddTransient<IRemindoService, RemindoService>()
             .AddLogging(builder =>
