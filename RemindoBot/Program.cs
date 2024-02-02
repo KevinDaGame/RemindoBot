@@ -74,6 +74,7 @@ public class Program
             .AddSingleton<CommandManager>()
             .AddTransient<ITimeParserService, TimeParserService>()
             .AddTransient<IRemindoRepository, RemindoRepository>()
+            .AddTransient<IUrbanDictionaryService, UrbanDictionaryService>()
             .AddTransient<IRemindoService, RemindoService>()
             .AddLogging(builder =>
             {
