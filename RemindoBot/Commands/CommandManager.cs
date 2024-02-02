@@ -24,10 +24,10 @@ public class CommandManager
     public void RegisterCommands()
     {
         _commands.Clear();
-        var commandTypes = Assembly.GetExecutingAssembly().GetTypes()
+        IEnumerable<Type> commandTypes = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(ICommand)));
 
-        foreach (var commandType in commandTypes)
+        foreach (Type commandType in commandTypes)
         {
             var command = (ICommand) ActivatorUtilities.CreateInstance(_services, commandType);
 
@@ -39,7 +39,7 @@ public class CommandManager
             }
             catch (ApplicationCommandException exception)
             {
-                var json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
+                string json = JsonConvert.SerializeObject(exception.Errors, Formatting.Indented);
                 _logger.LogError($"Unable to register command {command.Command.Name}: {json}");
             }
         }
