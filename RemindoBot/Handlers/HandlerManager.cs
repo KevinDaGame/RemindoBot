@@ -21,6 +21,7 @@ public class HandlerManager
 
     public void RegisterHandlers()
     {
+        _handlers.Clear();
         var handlerTypes = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(IHandler)));
 

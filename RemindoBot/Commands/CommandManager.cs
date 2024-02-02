@@ -23,6 +23,7 @@ public class CommandManager
 
     public void RegisterCommands()
     {
+        _commands.Clear();
         var commandTypes = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => t.GetInterfaces().Contains(typeof(ICommand)));
 
