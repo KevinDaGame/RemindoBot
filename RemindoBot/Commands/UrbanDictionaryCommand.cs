@@ -60,7 +60,7 @@ public class UrbanDictionaryCommand : ICommand
         MessageComponent buttons = new ComponentBuilder()
             .WithButton("View on Urban Dictionary", style: ButtonStyle.Link, url: definition.Permalink)
             .WithButton("Next definition", customId: $"urban-{word}-1")
-            .WithButton("Actual definition", customId: $"actual-{word}-0")
+            .WithButton("Actual definition", style: ButtonStyle.Success, customId: $"actual-{word}-0")
             .Build();
 
         await command.RespondAsync(embed: embed.Build(), components: buttons);
