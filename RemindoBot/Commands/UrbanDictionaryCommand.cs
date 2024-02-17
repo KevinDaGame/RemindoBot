@@ -31,9 +31,10 @@ public class UrbanDictionaryCommand : ICommand
         string word = command.Data.Options.First().Value.ToString() ??
                       throw new ArgumentNullException("word", "Word cannot be null");
         UrbanDictionaryDefinition? definition;
+        int definitionCount;
         try
         {
-            definition = await _urbanDictionaryService.GetDefinitionOfWord(word);
+            definition = await _urbanDictionaryService.GetDefinitionOfWord(word, out definitionCount);
         }
         catch (FlurlHttpException)
         {
@@ -51,15 +52,17 @@ public class UrbanDictionaryCommand : ICommand
             .WithTitle(definition.Word)
             .WithDescription(definition.Definition)
             .WithUrl(definition.Permalink)
-            .WithFooter(definition.Author)
+            .WithFooter(
+                $"{definition.Author} - [1/{definitionCount}] - {definition.Thumbs_up} 👍 {definition.Thumbs_down} 👎")
             .WithColor(Color.Blue)
             .WithTimestamp(DateTime.Parse(definition.Written_on));
-        
-        MessageComponent? viewButton = new ComponentBuilder()
+
+        MessageComponent buttons = new ComponentBuilder()
             .WithButton("View on Urban Dictionary", style: ButtonStyle.Link, url: definition.Permalink)
+            .WithButton("Next definition", customId: $"urban-{word}-1")
+            .WithButton("Actual definition", customId: $"actual-{word}-0")
             .Build();
-        
-        
-        await command.RespondAsync(embed: embed.Build(), components: viewButton);
+
+        await command.RespondAsync(embed: embed.Build(), components: buttons);
     }
 }

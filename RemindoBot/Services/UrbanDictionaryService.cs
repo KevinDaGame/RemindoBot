@@ -13,10 +13,27 @@ public class UrbanDictionaryService : IUrbanDictionaryService
         return result.List;
     }
 
-    public async Task<UrbanDictionaryDefinition?> GetDefinitionOfWord(string world)
+    public Task<UrbanDictionaryDefinition?> GetDefinitionOfWord(string world, out int definitionCount)
     {
-        List<UrbanDictionaryDefinition> result = await GetDefinitionsOfWord(world);
-        
-        return result.Count == 0 ? null : result.FirstOrDefault();
+        List<UrbanDictionaryDefinition> result = GetDefinitionsOfWord(world).Result;
+        definitionCount = result.Count;
+        return Task.FromResult(result.Count == 0 ? null : result.FirstOrDefault());
     }
+}
+
+public class UrbanDictionaryResponse
+{
+    public List<UrbanDictionaryDefinition> List { get; set; }
+}
+
+public class UrbanDictionaryDefinition
+{
+    public string Definition { get; set; }
+    public string Example { get; set; }
+    public string Permalink { get; set; }
+    public string Word { get; set; }
+    public int Thumbs_up { get; set; }
+    public int Thumbs_down { get; set; }
+    public string Author { get; set; }
+    public string Written_on { get; set; }
 }

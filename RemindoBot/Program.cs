@@ -50,7 +50,7 @@ public class Program
     {
         var handlerManager = _services.GetRequiredService<HandlerManager>();
         var commandManager = _services.GetRequiredService<CommandManager>();
-        
+
         handlerManager.RegisterHandlers();
         commandManager.RegisterCommands();
         return Task.CompletedTask;
@@ -75,11 +75,9 @@ public class Program
             .AddTransient<ITimeParserService, TimeParserService>()
             .AddTransient<IRemindoRepository, RemindoRepository>()
             .AddTransient<IUrbanDictionaryService, UrbanDictionaryService>()
+            .AddTransient<IActualDictionaryService, ActualDictionaryService>()
             .AddTransient<IRemindoService, RemindoService>()
-            .AddLogging(builder =>
-            {
-                builder.AddConsole();
-            })
+            .AddLogging(builder => { builder.AddConsole(); })
             .AddDbContext<RemindoDbContext>(optionsBuilder =>
                 optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)))
             .BuildServiceProvider();

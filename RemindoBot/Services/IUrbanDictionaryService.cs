@@ -3,5 +3,5 @@ namespace RemindoBot.Services;
 public interface IUrbanDictionaryService
 {
     public Task<List<UrbanDictionaryDefinition>> GetDefinitionsOfWord(string word);
-    public Task<UrbanDictionaryDefinition?> GetDefinitionOfWord(string world);
+    public Task<UrbanDictionaryDefinition?> GetDefinitionOfWord(string world, out int definitionCount);
 }
